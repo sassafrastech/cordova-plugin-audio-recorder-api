@@ -13,10 +13,13 @@ import android.os.Environment;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.Manifest;
+import android.util.Log;
+
 import java.util.UUID;
 import java.io.FileInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.Throwable;
 
 public class AudioRecorderAPI extends CordovaPlugin {
   private static final String RECORD = Manifest.permission.RECORD_AUDIO;
@@ -143,8 +146,16 @@ public class AudioRecorderAPI extends CordovaPlugin {
   }
 
   private void stopRecord(final CallbackContext callbackContext) {
-    myRecorder.stop();
-    myRecorder.release();
+    try {
+      myRecorder.stop();
+    } catch (Throwable e) {
+      Log.d("AudioRecorderAPI", " stopRecord myRecorder.stop(); " + e.getMessage());
+    }
+    try {
+      myRecorder.release();
+    } catch (Throwable e) {
+      Log.d("AudioRecorderAPI", " stopRecord myRecorder.release(); " + e.getMessage());
+    }
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         callbackContext.success(outputFile);
