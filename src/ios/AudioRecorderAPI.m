@@ -31,6 +31,9 @@
       NSLog(@"%@ %d %@", [err domain], [err code], [[err userInfo] description]);
     }
 
+    UInt32 audioRouteOverride = kAudioSessionOverrideAudioRoute_Speaker;
+    AudioSessionSetProperty (kAudioSessionProperty_OverrideAudioRoute, sizeof (audioRouteOverride),&audioRouteOverride);
+
     NSMutableDictionary *recordSettings = [[NSMutableDictionary alloc] init];
     [recordSettings setObject:[NSNumber numberWithInt: kAudioFormatMPEG4AAC] forKey: AVFormatIDKey];
     [recordSettings setObject:[NSNumber numberWithFloat:44100.0] forKey: AVSampleRateKey];
