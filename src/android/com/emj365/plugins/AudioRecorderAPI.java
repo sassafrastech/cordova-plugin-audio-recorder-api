@@ -48,8 +48,7 @@ public class AudioRecorderAPI extends CordovaPlugin {
         cordova.requestPermission(this, AUDIO_RECORD_PERMISSION_CALLBACK, RECORD);
 
         return true;
-      }
-      else {
+      } else {
         return record(context);
       }
     }
@@ -98,12 +97,12 @@ public class AudioRecorderAPI extends CordovaPlugin {
   }
 
   public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-    for (int r: grantResults){
+    for (int r : grantResults) {
       if (r == PackageManager.PERMISSION_DENIED) {
         this.callbackContext.error("Permission was denied");
       }
 
-      switch(requestCode) {
+      switch (requestCode) {
         case AUDIO_RECORD_PERMISSION_CALLBACK:
           this.record(cordova.getActivity().getApplicationContext());
           break;
@@ -117,9 +116,9 @@ public class AudioRecorderAPI extends CordovaPlugin {
     myRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
     myRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
     myRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-    myRecorder.setAudioSamplingRate(8000);
+    myRecorder.setAudioSamplingRate(44100);
     myRecorder.setAudioChannels(1);
-    myRecorder.setAudioEncodingBitRate(12000);
+    myRecorder.setAudioEncodingBitRate(44100);
     myRecorder.setOutputFile(outputFile);
 
     try {
@@ -135,7 +134,9 @@ public class AudioRecorderAPI extends CordovaPlugin {
     }
     if (seconds != -1) {
       countDowntimer = new CountDownTimer(seconds * 1000, 1000) {
-        public void onTick(long millisUntilFinished) {}
+        public void onTick(long millisUntilFinished) {
+        }
+
         public void onFinish() {
           stopRecord(callbackContext);
         }
