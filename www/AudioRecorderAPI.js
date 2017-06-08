@@ -14,7 +14,7 @@ AudioRecorderAPI.prototype.playback = function (successCallback, errorCallback) 
 };
 
 AudioRecorderAPI.prototype.deleteLast = function (successCallback, errorCallback) {
-    cordova.exec (successCallback, errorCallback, "AudioRecorderAPI", "playback", []);
+    cordova.exec (successCallback, errorCallback, "AudioRecorderAPI", "deleteLastRecord", []);
 };
 
 AudioRecorderAPI.install = function () {
