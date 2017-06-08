@@ -5,6 +5,7 @@
 @interface AudioRecorderAPI : CDVPlugin {
   NSString *recorderFilePath;
   NSNumber *duration;
+  Boolean *greetingPresent;
   AVAudioRecorder *recorder;
   AVAudioPlayer *player;
   CDVPluginResult *pluginResult;
@@ -14,5 +15,6 @@
 - (void)record:(CDVInvokedUrlCommand*)command;
 - (void)stop:(CDVInvokedUrlCommand*)command;
 - (void)playback:(CDVInvokedUrlCommand*)command;
+- (void)deleteLastRecord: (CDVInvokedUrlCommand*)command;
 
 @end
