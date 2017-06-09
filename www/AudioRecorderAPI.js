@@ -1,20 +1,20 @@
 function AudioRecorderAPI() {
 }
 
-AudioRecorderAPI.prototype.record = function (successCallback, errorCallback, duration) {
-  cordova.exec(successCallback, errorCallback, "AudioRecorderAPI", "record", duration ? [duration] : []);
+AudioRecorderAPI.prototype.record = function (successCallback, errorCallback, duration, name) {
+  cordova.exec(successCallback, errorCallback, "AudioRecorderAPI", "record", duration ? [duration, name] : [name]);
 };
 
 AudioRecorderAPI.prototype.stop = function (successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "AudioRecorderAPI", "stop", []);
 };
 
-AudioRecorderAPI.prototype.playback = function (successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "AudioRecorderAPI", "playback", []);
+AudioRecorderAPI.prototype.playback = function (successCallback, errorCallback, name) {
+  cordova.exec(successCallback, errorCallback, "AudioRecorderAPI", "playback", [name]);
 };
 
-AudioRecorderAPI.prototype.deleteLast = function (successCallback, errorCallback) {
-    cordova.exec (successCallback, errorCallback, "AudioRecorderAPI", "deleteLastRecord", []);
+AudioRecorderAPI.prototype.deleteLast = function (successCallback, errorCallback, name) {
+  cordova.exec (successCallback, errorCallback, "AudioRecorderAPI", "deleteLastRecord", [name]);
 };
 
 AudioRecorderAPI.install = function () {

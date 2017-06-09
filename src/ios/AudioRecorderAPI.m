@@ -6,9 +6,28 @@
 #define RECORDINGS_FOLDER [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]
 
 - (void)record:(CDVInvokedUrlCommand*)command {
-    if (greetingPresent) {
-        [self deleteLast];
+    
+    NSString* recordingName = @"";
+    NSString* recordingNameWithExtension = @"";
+    
+    if (command.arguments.count > 1) {
+        recordingName = [command.arguments objectAtIndex:1];
     }
+    else {
+        recordingName = [command.arguments objectAtIndex:0];
+    }
+    
+    recorderFilePath = [NSString stringWithFormat:@"%@", RECORDINGS_FOLDER];
+    NSArray* filesPresent = [self listFileAtPath:recorderFilePath];
+    
+    recordingNameWithExtension = [NSString stringWithFormat:@"%@.m4a", recordingName];
+    
+    for (id arrayElement in filesPresent) {
+        if ([arrayElement isEqualToString:recordingNameWithExtension]) {
+            [self deleteLast: recordingName];
+        }
+    }
+    
   _command = command;
   if ([_command.arguments count] > 0) {
     duration = [_command.arguments objectAtIndex:0];
@@ -46,8 +65,7 @@
 
     // Create a new dated file
     //NSString *uuid = [[NSUUID UUID] UUIDString];
-    NSString *uuid = @"WelcomeGreeting";
-    recorderFilePath = [NSString stringWithFormat:@"%@/%@.m4a", RECORDINGS_FOLDER, uuid];
+    recorderFilePath = [NSString stringWithFormat:@"%@/%@", RECORDINGS_FOLDER, recordingNameWithExtension];
     NSLog(@"recording file path: %@", recorderFilePath);
 
     NSURL *url = [NSURL fileURLWithPath:recorderFilePath];
@@ -90,7 +108,10 @@
 - (void)playback:(CDVInvokedUrlCommand*)command {
   _command = command;
   [self.commandDelegate runInBackground:^{
-    NSLog(@"recording playback");
+    NSString *fileToReproduce = [_command.arguments objectAtIndex:0];
+    NSLog(@"recording playback %@.m4a", fileToReproduce);
+    recorderFilePath = [NSString stringWithFormat:@"%@/%@.m4a", RECORDINGS_FOLDER, fileToReproduce];
+
     NSURL *url = [NSURL fileURLWithPath:recorderFilePath];
     NSError *err;
     player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
@@ -106,20 +127,19 @@
 }
 
 - (void)deleteLastRecord: (CDVInvokedUrlCommand*)command {
-    if (greetingPresent) {
-        [self deleteLast];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"DeleteCompelte"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
+    NSString *fileToDelete = [command.arguments objectAtIndex:0];
+    [self deleteLast: fileToDelete];
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"DeleteCompelte"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void) deleteLast {
+- (void) deleteLast: (NSString*) fileToDelete {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     NSError *error;
+    recorderFilePath = [NSString stringWithFormat:@"%@/%@.m4a", RECORDINGS_FOLDER, fileToDelete];
     BOOL success = [fileManager removeItemAtPath:recorderFilePath error:&error];
     if (success) {
-        greetingPresent = NO;
         UIAlertView *removedSuccessFullyAlert = [[UIAlertView alloc] initWithTitle:@"Congratulations:" message:@"Successfully removed" delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
         [removedSuccessFullyAlert show];
     }
@@ -128,6 +148,18 @@
         NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
     }
 
+}
+
+-(NSArray *)listFileAtPath:(NSString *)path
+{
+    int count;
+    
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
+    for (count = 0; count < (int)[directoryContent count]; count++)
+    {
+        NSLog(@"File %d: %@", (count + 1), [directoryContent objectAtIndex:count]);
+    }
+    return directoryContent;
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
@@ -144,7 +176,6 @@
     NSLog(@"audio data: %@ %d %@", [err domain], [err code], [[err userInfo] description]);
   } else {
     NSLog(@"recording saved: %@", recorderFilePath);
-      greetingPresent = YES;
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:recorderFilePath];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:_command.callbackId];
   }
